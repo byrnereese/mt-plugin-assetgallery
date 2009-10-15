@@ -1,0 +1,149 @@
+<mt:unless name="asset_gallery_js">
+    <script type="text/javascript" src="<mt:var name="static_uri">plugins/AssetGallery/js/mootools.js"></script>
+    <script type="text/javascript" src="<mt:var name="static_uri">plugins/AssetGallery/js/Stickman.MultiUpload.packed.js"></script>
+    <script type="text/javascript" src="<mt:var name="static_uri">plugins/AssetGallery/js/MooFlow.packed.js"></script>
+    <script type="text/javascript">
+    <!--
+        function galleryView(id, view) {
+            var viewFields, editFields, origValue;
+            if(view == true) { // Cancel Editing
+                viewFields = 'block';
+                editFields = 'none';
+            } else {
+                viewFields = 'none';
+                editFields = 'block';
+            }            
+            
+            $(id + '_listing').style.display = editFields;
+            $(id + '_cancel_button').style.display = editFields;
+            $(id + '_delete_button').style.display = editFields;
+            
+            $(id + '_edit_button').style.display = viewFields;
+            <mt:if name="has_thumbnail">$(id + '_flow').style.display = viewFields;</mt:if>
+            
+            if(view == true) { // Cancel Editing - reset everything
+                eval("origValue = " + id + "origValue");
+                $(id).value = origValue;
+             
+                var trs = document.getElementById(id + '-listing').getElementsByTagName('tr');
+                for (var i = 0; i < trs.length; i++) 
+                    trs[i].style.display = 'table-row';
+            }            
+        }
+        
+        function deleteAssets(id) {
+            var inputs, ids = new Array();
+            inputs = document.getElementById(id + '-listing').getElementsByClassName('select');
+            for (var i = 0; i < inputs.length; i++) {
+                var cbx = inputs[i];
+
+                if(cbx.checked == true) {
+                    document.getElementById('asset-' + cbx.value).style.display = 'none';
+                } else {
+                    ids.push(cbx.value);
+                } 
+                
+            }
+            document.getElementById(id).value = ids.join(',');
+        }
+    //-->
+    </script>
+    <style type="text/css">
+        div.item {
+            margin-top: 5px;
+        }
+        div.item img {
+            width: 12px;
+            height: 10px;
+            background:url('<mt:var name="static_uri">plugins/AssetGallery/images/cross_small.gif') no-repeat;
+            text-index:-999em;
+            margin-right: 5px;
+            display: inline-block;
+        }
+    </style>
+</mt:unless>
+<mt:setvar name="asset_gallery_js" value="1">
+<input type="hidden" name="<mt:var name="field_id">" value="<mt:var name="field_value">" id="<mt:var name="field_id">" />
+<input type="hidden" name="<mt:var name="field_id">_options" value="<mt:var name="options">" id="<mt:var name="field_id">_options" />
+    
+<mt:unless name="field_value">
+    <!-- If there's' nothing in the gallery, just show file upload -->
+    <input type="file" id="<mt:var name="field_id">_multifile" name="<mt:var name="field_id">_multifile" />
+<mt:else>
+    <div id="<mt:var name="field_id">_listing" style="margin-top: 20px; <mt:if name="has_thumbnail">display: none;</mt:if>">
+        <mtapp:setting id="add_more" label="<__trans phrase="Add More">">
+            <input type="file" id="<mt:var name="field_id">_multifile" name="<mt:var name="field_id">_multifile" />
+        </mtapp:setting>
+        <mtapp:listing type="asset.image" loop="asset_loop" hide_pager="1" id="$listing_id">
+            <mt:if __first__>
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th id="as-file-name"><__trans phrase="Title"></th>
+                        <th id="as-view" class="status-view"><__trans phrase="View"></th>
+                    </tr>
+                </thead>
+                <tbody>
+            </mt:if>
+                    <tr id="asset-<mt:var name="id">" class="<mt:if name="__odd__">odd<mt:else>even</mt:if>">
+                        <td class="cb">
+                            <input type="hidden" id="asset-<mt:var name="id">-json" value="<mt:var name="metadata_json" escape="html">" />
+                            <input type="checkbox" name="id" value="<mt:var name="id">" class="select" />
+                        </td>
+                        <td>
+                            <a href="<$mt:var name="script_url"$>?__mode=view&amp;_type=<mt:var name="object_type">&amp;id=<$mt:var name="id"$>&amp;blog_id=<$mt:var name="blog_id"$>" title="<$mt:var name="file_name"$>"><$mt:var name="file_label" escape="html"$></a>
+                        </td>
+                        <td class="si status-view"><mt:if name="url"><a href="<mt:var name="url">" target="view_uploaded" title="<__trans phrase="View">"><img src="<mt:var name="static_uri">images/spacer.gif" alt="<__trans phrase="View">" width="13" height="9" /></a><mt:else>&nbsp;</mt:if></td>
+                    </tr>
+        </mtapp:listing>
+    </div>
+    
+    <div class="actions-bar" style="margin: 10px auto; margin-bottom: -10px;">
+        <div class="actions-bar-inner pkg actions">
+            <mt:if name="has_thumbnail"><button type="button" onclick="galleryView('<mt:var name="field_id">', false);" id="<mt:var name="field_id">_edit_button"><__trans phrase="Edit Gallery"></button>
+                
+            <button type="button" onclick="galleryView('<mt:var name="field_id">', true)" id="<mt:var name="field_id">_cancel_button" style="display: none;"><__trans phrase="Cancel"></button></mt:if>
+                
+            <button type="button" onclick="deleteAssets('<mt:var name="field_id">')" id="<mt:var name="field_id">_delete_button" style="<mt:if name="has_thumbnail">display: none;</mt:if>"><__trans phrase="Delete Selected"></button>
+        </div>
+    </div>
+    
+    <mt:if name="has_thumbnail">
+    <div id="<mt:var name="field_id">_flow" style="clear: both; display: none;">
+        <mt:loop name="asset_loop">
+	        <div><img src="<mt:var name="thumbnail_url">" alt="<mt:var name="label">" title="<mt:var name="label">" /></div>
+	    </mt:loop>
+    </div>
+    </mt:if>
+
+</mt:unless>
+
+<script type="text/javascript">
+<mt:if name="has_thumbnail">var <mt:var name="field_id">origValue = '<mt:var name="field_value">';
+var <mt:var name="field_id">maxHeight = '<mt:var name="max_height">';
+var <mt:var name="field_id">width = $('<mt:var name="field_id">_flow').parentNode.getWidth();
+var <mt:var name="field_id">heightRatio = <mt:if name="height_ratio"><mt:var name="height_ratio"><mt:else>0.1 + (<mt:var name="field_id">maxHeight / <mt:var name="field_id">width)</mt:if>;
+var <mt:var name="field_id">Flow = {
+
+	start: function(){
+
+		var mf = new MooFlow($('<mt:var name="field_id">_flow'), {
+		    bgColor: '#FFFFFF',
+			stylePath: '<mt:var name="static_uri">plugins/AssetGallery/MooFlow.css',
+			useCaption: false,
+            useSlider: true,
+			useMouseWheel: true,
+			useKeyInput: true,
+            // startIndex: 4,
+			factor: 100,
+			heightRatio: <mt:var name="field_id">heightRatio
+		});	
+	}
+	
+};</mt:if>
+
+<mt:if name="has_thumbnail">window.addEvent('domready', <mt:var name="field_id">Flow.start);</mt:if>
+window.addEvent('domready', function(){
+     new MultiUpload( $( 'entry_form' ).<mt:var name="field_id">_multifile );
+});
+</script>
