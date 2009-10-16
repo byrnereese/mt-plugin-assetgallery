@@ -1,0 +1,31 @@
+id: AssetGallery
+name: Asset Gallery
+version: 1.0
+description: "Introduces a new custom field that allows you to create a gallery of assets"
+author_name: "Six Apart, Byrne Reese"
+author_link: "http://www.sixapart.com/"
+
+customfield_types: $AssetGallery::AssetGallery::load_customfield_type
+tags: $AssetGallery::AssetGallery::load_tags
+
+callbacks: 
+  MT::App::CMS::template_source.edit_entry: $AssetGallery::AssetGallery::xfrm_entry
+  api_post_save.entry: 
+    handler: $AssetGallery::AssetGallery::CMSPostSave
+    priority: 2
+  cms_post_save.entry:
+    handler: $AssetGallery::AssetGallery::CMSPostSave
+    priority: 2
+  cms_post_save.page:
+    handler: $AssetGallery::AssetGallery::CMSPostSave
+    priority: 2
+  cms_post_save.category:
+    handler: $AssetGallery::AssetGallery::CMSPostSave
+    priority: 2
+  cms_post_save.folder:
+    handler: $AssetGallery::AssetGallery::CMSPostSave
+    priority: 2
+  cms_post_save.author:
+    handler: $AssetGallery::AssetGallery::CMSPostSave
+    priority: 2
+

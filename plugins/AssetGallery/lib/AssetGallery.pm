@@ -8,7 +8,7 @@ sub load_customfield_type {
         'asset_gallery' => {
             label => 'Asset Gallery',
             field_html => sub{
-                my $plugin = MT::Plugin::AssetGallery->instance;
+                my $plugin = MT->component('AssetGallery');
                 return $plugin->load_tmpl('asset-gallery.tmpl');  
             },
             field_html_params => sub {
@@ -16,11 +16,10 @@ sub load_customfield_type {
                 my $max_height = 0; 
                 # my $max_width = 580; 
 
-                require MT::Asset;
                 my @asset_loop;
                 my @asset_ids = split ',', $param->{value};
                 foreach my $id (@asset_ids) {
-                    my $asset = MT::Asset->load($id) or next;
+                    my $asset = MT->model('asset')->load($id) or next;
                     
                     my $row = $asset->column_values;
                     $row->{url} = $asset->url; # this has to be called to calculate
@@ -74,30 +73,34 @@ sub load_tags {
     return $tags;
 }
 
+sub xfrm_entry {  
+    my ($cb, $app, $tmpl) = @_; 
+    $$tmpl =~ s/(name="entry_form")/$1 enctype=\"multipart\/form-data\"/g; 
+}
+
 sub CMSPostSave {
     my ($cb, $app, $obj) = @_;
-    
     return unless $app->isa('MT::App');
-    
     my $q = $app->param;
-    
-    foreach ($app->param) {
-		if(m/^(.*?)_multifile_(.*?)$/) {
-		    my $field_name = "$1_multifile_$2";
-		    my $customfield_value = $q->param($1);
-		    
-		    next if !$q->param($field_name);
-		    
-            my ($asset, $bytes) = _upload_file($app, $obj, $field_name, $1);
-            
+    foreach my $field ($app->param) {
+	if(my ($parent,$i) = ($field =~ m/^customfield_(.*?)_multifile_(.*?)$/)) {
+	    my @assets = split(",",$app->param('customfield_'.$parent));
+	    unless ($q->param($field)) {
+		$app->{'query'}->delete($field); # remove so others don't process it
+		next;
+	    }
+            my ($asset, $bytes) = _upload_file($app, $obj, $field, $parent);
+#	    use Data::Dumper; MT->log({ message => "Uploaded asset (".Dumper($asset)."), bytes: $bytes" });
+	    $app->{'query'}->delete($field); # remove so others don't process it
             next if !defined $asset;
-
-            $app->param($1, join ',', $customfield_value, $asset->id);
+	    push @assets, $asset->id;
+            $app->param('customfield_'.$parent,join(',', @assets));
+	    MT->log({ message => "app->param(customfield_".$parent.") = " . $app->param('customfield_'.$parent) });
         }
-	}
-	
-	return 1;
+    }
+    return 1;
 }
+
 ## Mostly copied from MT::App::CMS::Asset::_upload_file
 ## we have to make it more re-usable!!
 sub _upload_file {
@@ -105,19 +108,16 @@ sub _upload_file {
     
     my $q = $app->param;
     
-    require MT::Blog;
-    my $blog_id = $app->param('blog_id');
-    my $blog = MT::Blog->load($blog_id);
+    my $blog = $app->blog;
+    my $blog_id = $blog->id;
     my $fmgr = $blog->file_mgr;
     my $root_path = $blog->site_path;
     my $obj_type = $obj->class_type || $obj->datasource;
     
     my ($fh, $info) = $app->upload_info($field_name);
-    
+
     my $mimetype;
-    if ($info) {
-        $mimetype = $info->{'Content-Type'};
-    }
+    $mimetype = $info->{'Content-Type'} if ($info);
     
     # eval { $fh = $q->upload($field_name) };
     #           if ($@ && $@ =~ /^Undefined subroutine/) {
@@ -129,34 +129,44 @@ sub _upload_file {
     $basename =~ s!^.*/!!;    ## Get rid of full directory paths
 
     my $relative_path;
-    my $file_tmpl = $app->param("${field_id}_options");
-    my ($ctx);
+
+    require CustomFields::Field;
+    my $field = CustomFields::Field->load(
+	{
+	    $blog_id ? ( blog_id => [ $blog_id, 0 ] ) : ( blog_id => $blog_id ),
+	    basename => $field_id,
+	}
+    );
+    my $file_tmpl = $field->options;
+
     if ( $file_tmpl =~ m/\%[_-]?[A-Za-z]/ ) {
         if ( $file_tmpl =~ m/<\$?MT/i ) {
             $file_tmpl =~
-s!(<\$?MT[^>]+?>)|(%[_-]?[A-Za-z])!$1 ? $1 : '<MTFileTemplate format="'. $2 . '">'!gie;
+		s!(<\$?MT[^>]+?>)|(%[_-]?[A-Za-z])!$1 ? $1 : '<mt:FileTemplate format="'. $2 . '">'!gie;
         }
         else {
-            $file_tmpl = qq{<MTFileTemplate format="$file_tmpl">};
+            $file_tmpl = qq{<mt:FileTemplate format="$file_tmpl">};
         }
     }
-    if ($file_tmpl) {
-        require MT::Template::Context;
-        $ctx = MT::Template::Context->new;
-        $ctx->stash( 'blog', $blog );
-    }
+
+    require MT::Template::Context;
+    my $ctx = MT::Template::Context->new;
+    $ctx->{current_timestamp} = $obj->created_on;
     local $ctx->{__stash}{$obj_type} = $obj;
+    local $ctx->{__stash}{blog} = $blog;
     local $ctx->{__stash}{archive_category} = $obj if $obj_type eq 'category';
     local $ctx->{__stash}{author} = $obj_type eq 'entry' ? $obj->author : $app->user;
+
     require MT::Builder;
     my $build = MT::Builder->new;
     my $tokens = $build->compile( $ctx, $file_tmpl )
       or return $blog->error( $build->errstr() );
-    defined( $relative_path = $build->build( $ctx, $tokens ) )
-      or return $blog->error( $build->errstr() );
+    unless ( $relative_path = $build->build( $ctx, $tokens ) ) {
+	MT->log({ message => "error building $file_tmpl: " . $build->errstr() });
+	return $blog->error( $build->errstr() );
+    }
 
     my $path = File::Spec->catdir( $root_path, $relative_path );
-    
     unless ( $fmgr->exists($path) ) {
         $fmgr->mkpath($path)
           or return $app->error($app->translate(
@@ -224,8 +234,7 @@ s!(<\$?MT[^>]+?>)|(%[_-]?[A-Za-z])!$1 ? $1 : '<MTFileTemplate format="'. $2 . '"
     my $ext =
       ( File::Basename::fileparse( $local_file, qr/[A-Za-z0-9]+$/ ) )[2];
     
-    require MT::Asset;
-    my $asset_pkg = MT::Asset->handler_for_file($local_basename);
+    my $asset_pkg = MT->model('asset')->handler_for_file($local_basename);
     my $is_image  = defined($w)
       && defined($h)
       && $asset_pkg->isa('MT::Asset::Image');
@@ -331,15 +340,14 @@ sub _hdlr_assets {
 
     return '' unless $value;
     
-    require MT::Asset;
-    my @asset_ids = split /,/, $value;
+    my @asset_ids = split(/,/, $value);
     my $count = 0;
     my $asset_count = 0;
     my $vars = $ctx->{__stash}{vars} ||= {};
     foreach my $id (@asset_ids) {
         $count++;
         
-        my $asset = MT::Asset->load($id);
+        my $asset = MT->model('asset')->load($id);
         next unless $asset;
         
         $asset_count++;
