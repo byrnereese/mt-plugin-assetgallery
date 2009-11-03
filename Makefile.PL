@@ -2,6 +2,6 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME            => 'Asset Gallery',
-    VERSION         => '1.0.1',
+    VERSION         => '1.1',
     DISTNAME        => 'AssetGallery',
 );

@@ -23,10 +23,12 @@ sub load_customfield_type {
                     
                     my $row = $asset->column_values;
                     $row->{url} = $asset->url; # this has to be called to calculate
-                    $row->{file_label} = $row->{label} = $asset->label || $row->{file_name} || MT->translate('Untitled');
-                    
+                    $row->{asset_id} = $asset->id; # this has to be called to calculate
+                    $row->{label} = $asset->label;
+		    $row->{description} = $asset->description;
+
                     if($asset->has_thumbnail) {
-                        my @thumbnail = $asset->thumbnail_url( Width => 130 );
+                        my @thumbnail = $asset->thumbnail_url( Width => 60, Square => "1" );
                         $row->{thumbnail_url} = $thumbnail[0];                
                         $max_height = $thumbnail[2] if $thumbnail[2] > $max_height;
                         
@@ -39,6 +41,7 @@ sub load_customfield_type {
                 # $param->{height_ratio} = 0.1 + ($max_height / $max_width);
                 $param->{max_height} = $max_height;
                 $param->{listing_id} = $param->{field_id} . '-listing';
+		($param->{field_basename}) = ($param->{field_id} =~ /^customfield_(.*)$/);
             },
             options_field => q{
                 <div class="textarea-wrapper">&#60;<__trans phrase="Site Root">&#62; / <input type="text" name="options" value="<mt:var name="options" escape="html">" id="options" class="half-width" /></div>
@@ -82,7 +85,19 @@ sub CMSPostSave {
     my ($cb, $app, $obj) = @_;
     return unless $app->isa('MT::App');
     my $q = $app->param;
+    my $multifields;
     foreach my $field ($app->param) {
+	if(my ($parent,$aid) = ($field =~ m/^asset_([^_]*)_(\d+)_label$/)) {
+	    $multifields->{'customfield_'.$parent} = 1;
+	    my $asset = MT->model('asset')->load( $aid );
+	    next unless $asset;
+	    my $base = 'asset_'.$parent.'_'.$aid;
+	    $asset->label( $app->param($base.'_label') );
+	    $asset->description( $app->param($base.'_description') );
+	    $app->{'query'}->delete($base.'_label');
+	    $app->{'query'}->delete($base.'_description');
+	    $asset->save;
+	}
 	if(my ($parent,$i) = ($field =~ m/^customfield_(.*?)_multifile_(.*?)$/)) {
 	    my @assets = split(",",$app->param('customfield_'.$parent));
 	    unless ($q->param($field)) {
@@ -90,16 +105,29 @@ sub CMSPostSave {
 		next;
 	    }
             my ($asset, $bytes) = _upload_file($app, $obj, $field, $parent);
-#	    use Data::Dumper; MT->log({ message => "Uploaded asset (".Dumper($asset)."), bytes: $bytes" });
 	    $app->{'query'}->delete($field); # remove so others don't process it
             next if !defined $asset;
 	    push @assets, $asset->id;
+
             $app->param('customfield_'.$parent,join(',', @assets));
-	    MT->log({ message => "app->param(customfield_".$parent.") = " . $app->param('customfield_'.$parent) });
+#	    MT->log({ message => "app->param(customfield_".$parent.") = " . $app->param('customfield_'.$parent) });
         }
+    }
+#    clean up
+    foreach my $f (keys %$multifields) {
+	my @assets;
+	foreach my $id ( split(',',$app->param($f)) ) { 
+	    if (MT->model('asset')->load($id)) {
+		push @assets, $id if (MT->model('asset')->load($id));
+	    }
+	}
+	$app->param($f,join(',', @assets));
+#	MT->log({ message => "app->param($f) = " . $app->param($f) });
+	$obj->save;
     }
     return 1;
 }
+
 
 ## Mostly copied from MT::App::CMS::Asset::_upload_file
 ## we have to make it more re-usable!!
