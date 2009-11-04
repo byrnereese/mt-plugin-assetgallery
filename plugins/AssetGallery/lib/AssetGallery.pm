@@ -2,6 +2,8 @@ package AssetGallery;
 
 use strict;
 use MT::Util qw( encode_url );
+use File::Spec qw( catfile );
+use Digest::SHA qw( sha1_base64 );
 
 sub load_customfield_type {
     my $customfield_type = {
@@ -49,7 +51,6 @@ sub load_customfield_type {
             },
             column_def => 'vchar',
             order => 799,
-            context => 'blog',
             no_default => 1
         }
     };
@@ -70,6 +71,10 @@ sub load_tags {
                     $_[0]->stash('field', $field);
                     &_hdlr_assets;
                 };
+		$tags->{function}->{$tag . 'AssetCount'} = sub {
+                    $_[0]->stash('field', $field);
+                    &_hdlr_asset_count;
+		};
             }
         }
     }
@@ -99,6 +104,7 @@ sub CMSPostSave {
 	    $asset->save;
 	}
 	if(my ($parent,$i) = ($field =~ m/^customfield_(.*?)_multifile_(.*?)$/)) {
+	    $multifields->{'customfield_'.$parent} = 1;
 	    my @assets = split(",",$app->param('customfield_'.$parent));
 	    unless ($q->param($field)) {
 		$app->{'query'}->delete($field); # remove so others don't process it
@@ -108,9 +114,8 @@ sub CMSPostSave {
 	    $app->{'query'}->delete($field); # remove so others don't process it
             next if !defined $asset;
 	    push @assets, $asset->id;
-
             $app->param('customfield_'.$parent,join(',', @assets));
-#	    MT->log({ message => "app->param(customfield_".$parent.") = " . $app->param('customfield_'.$parent) });
+#	    MT->log({ message => "app->param(".'customfield_'.$parent.") = " . $app->param('customfield_'.$parent) });
         }
     }
 #    clean up
@@ -123,8 +128,8 @@ sub CMSPostSave {
 	}
 	$app->param($f,join(',', @assets));
 #	MT->log({ message => "app->param($f) = " . $app->param($f) });
-	$obj->save;
     }
+    $obj->save if $multifields;
     return 1;
 }
 
@@ -194,7 +199,16 @@ sub _upload_file {
 	return $blog->error( $build->errstr() );
     }
 
-    my $path = File::Spec->catdir( $root_path, $relative_path );
+    #my $path = File::Spec->catdir( $root_path, $relative_path );
+    my $path;
+
+    my $digest = sha1_base64($fh);
+    $digest =~ s{[/+]}{}g;
+    $digest =~ s{(.......)}{\1,}g;
+    my @dirs = split(/,/, $digest);
+    $path = File::Spec->catdir( $root_path, $relative_path, @dirs );
+#    MT->log({ message => "digest: $digest, some path: $somepath, split: " . join(',',@dirs) });
+
     unless ( $fmgr->exists($path) ) {
         $fmgr->mkpath($path)
           or return $app->error($app->translate(
@@ -205,13 +219,15 @@ sub _upload_file {
     }
     
     my $relative_url =
-      File::Spec->catfile( $relative_path, encode_url($basename) );
+      File::Spec->catfile( $relative_path, @dirs, encode_url($basename) );
     $relative_path = $relative_path
-      ? File::Spec->catfile( $relative_path, $basename )
+      ? File::Spec->catfile( $relative_path, @dirs, $basename )
       : $basename;
     my $asset_file = $q->param('site_path') ? '%r' : '%a';
     $asset_file = File::Spec->catfile( $asset_file, $relative_path );
     my $local_file = File::Spec->catfile( $path, $basename );
+
+
     my $base_url = $app->param('site_path') ? $blog->site_url
       : $blog->archive_url;
     my $asset_base_url = $app->param('site_path') ? '%r' : '%a';
@@ -355,8 +371,19 @@ sub _upload_file {
     return ($asset, $bytes);
 }
 
+sub _hdlr_asset_count {
+    my ($ctx, $args, $cond) = @_;
+    require CustomFields::Template::ContextHandlers;
+    my $plugin = MT->component("AssetGallery");
+    my $value = CustomFields::Template::ContextHandlers::_hdlr_customfield_value($ctx, $args);
+
+    return 0 unless $value;
+    my @asset_ids = split(/,/, $value);
+    return $#asset_ids;
+}
+
 sub _hdlr_assets {
-    my $plugin = MT->component("Commercial");
+    my $plugin = MT->component("AssetGallery");
     my ($ctx, $args, $cond) = @_;
 
     my $tokens = $ctx->stash('tokens');
@@ -364,7 +391,7 @@ sub _hdlr_assets {
     my $res = '';
 
     require CustomFields::Template::ContextHandlers;
-    my $value = CustomFields::Template::ContextHandlers::_hdlr_customfield_value($plugin, $ctx, $args);
+    my $value = CustomFields::Template::ContextHandlers::_hdlr_customfield_value($ctx, $args);
 
     return '' unless $value;
     
@@ -372,6 +399,8 @@ sub _hdlr_assets {
     my $count = 0;
     my $asset_count = 0;
     my $vars = $ctx->{__stash}{vars} ||= {};
+    my $lastn = $args->{lastn};
+
     foreach my $id (@asset_ids) {
         $count++;
         
@@ -379,6 +408,7 @@ sub _hdlr_assets {
         next unless $asset;
         
         $asset_count++;
+	last if $lastn && $asset_count > $lastn;
         
         local $ctx->{__stash}{asset} = $asset;
         local $vars->{__first__} = $asset_count == 1;

@@ -29,7 +29,7 @@ ul.gallery-asset-list li.expanded .gallery-actions a { display: none; }
 .gallery-asset input { width: 425px; }
 .gallery-asset input.label { margin-bottom: 5px; }
 
-ul {
+ul.gallery-asset-list {
   overflow: auto;
   max-height: 260px;
 }
@@ -37,6 +37,7 @@ ul.gallery-asset-list li {
    border-bottom: 1px solid #ddd;
    padding-bottom: 3px;
    margin-bottom: 3px;
+   background-color: white;
 }
 
 .gallery_upload_queue {

@@ -1,5 +1,7 @@
 <mt:unless name="asset_gallery_js">
     <script type="text/javascript" src="<mt:var name="static_uri">jquery/jquery.js"></script>
+    <script type="text/javascript" src="<mt:var name="static_uri">jquery/ui/ui.core.js"></script>
+    <script type="text/javascript" src="<mt:var name="static_uri">jquery/ui/ui.sortable.js"></script>
     <script type="text/javascript" src="<mt:var name="static_uri">plugins/AssetGallery/js/jquery.MultiFile.pack.js"></script>
     <script type="text/javascript" src="<mt:var name="static_uri">plugins/AssetGallery/js/field.js"></script>
     <link rel="stylesheet" type="text/css" href="<mt:var name="static_uri">plugins/AssetGallery/css/field.css" />
@@ -12,6 +14,17 @@ $(document).ready( function() {
       remove: '<img src="<mt:var name="static_uri">plugins/AssetGallery/images/delete.png" height="16" width="16" alt="x"/>' 
     } 
     ,namePattern: '$name_$i'
+  });
+  $('ul.gallery-asset-list').sortable({
+    stop : function (event, ui) { 
+      var id = $(this).attr('mt:field_id');
+      var order = '';
+      $('.gallery-asset-list li').each( function() {
+        if (order != '') order += ',';
+        order += $(this).attr('mt:asset_id');
+      });
+      $('#'+id).val( order );
+    } 
   });
 });
 </script>
@@ -29,7 +42,8 @@ $(document).ready( function() {
             <mt:if __first__>
             <ul mt:field_id="<$mt:var name="field_id"$>" class="gallery-asset-list">
             </mt:if>
-                    <li id="asset-<mt:var name="id">" class="<mt:if name="__odd__">odd<mt:else>even</mt:if> pkg">
+                    <li id="asset-<mt:var name="id">" mt:asset_id="<mt:var name="id">" 
+                          class="<mt:if name="__odd__">odd<mt:else>even</mt:if> pkg">
                         <div class="gallery-thumbnail list-col">
                             <img src="<$mt:var name="thumbnail_url"$>" />           
                         </div>
