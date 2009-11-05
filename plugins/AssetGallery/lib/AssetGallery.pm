@@ -3,7 +3,7 @@ package AssetGallery;
 use strict;
 use MT::Util qw( encode_url );
 use File::Spec qw( catfile );
-use Digest::SHA qw( sha1_base64 );
+use Digest::SHA1 qw( sha1_base64 );
 
 sub load_customfield_type {
     my $customfield_type = {
@@ -204,7 +204,7 @@ sub _upload_file {
 
     my $digest = sha1_base64($fh);
     $digest =~ s{[/+]}{}g;
-    $digest =~ s{(.......)}{\1,}g;
+    $digest =~ s{(.......)}{$1,}g;
     my @dirs = split(/,/, $digest);
     $path = File::Spec->catdir( $root_path, $relative_path, @dirs );
 #    MT->log({ message => "digest: $digest, some path: $somepath, split: " . join(',',@dirs) });
@@ -379,7 +379,7 @@ sub _hdlr_asset_count {
 
     return 0 unless $value;
     my @asset_ids = split(/,/, $value);
-    return $#asset_ids;
+    return $#asset_ids + 1;
 }
 
 sub _hdlr_assets {
