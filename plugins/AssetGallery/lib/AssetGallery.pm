@@ -379,7 +379,8 @@ sub _hdlr_asset_count {
 
     return 0 unless $value;
     my @asset_ids = split(/,/, $value);
-    return $#asset_ids + 1;
+    my $count = $#asset_ids + 1;
+    return $ctx->count_format($count, $args);
 }
 
 sub _hdlr_assets {
