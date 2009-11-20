@@ -1,0 +1,239 @@
+/* --------------------------------------------- */
+/* Images and captions + other stuff */
+.gallery-item {
+	margin-top: 12px;
+}
+.gallery-entry .gallery-slide {
+	width: 574px;
+	height: 380px;
+	background: #000;
+	text-align: center;
+	padding: 3px;
+    position: relative;
+	overflow: hidden;
+}
+	.gallery-entry .gallery-slide img {
+		margin: 0 auto;
+		vertical-align: middle;
+	}
+	.gallery-entry .gallery-slide img.next {
+		display: none;
+		margin: 0 auto;
+		vertical-align: middle;
+	}
+	.gallery-entry .gallery-item .image-description {
+		text-align: left;
+		background: #ddd;
+		padding: 8px 0px 8px 8px;
+		width: 572px;
+		margin-bottom: 8px;
+		-moz-border-radius-bottomright: 4px;
+		-moz-border-radius-bottomleft: 4px;
+		border-radius-bottomright: 4px;
+		border-radius-bottomleft: 4px;
+	}
+	.gallery-entry #photo-number {
+		font-family: Arial, Verdana, Helvetica;
+		color: #f0f0f0;
+		background: #000;
+		padding: 4px;
+		-moz-border-radius-topleft: 4px;
+		border-radius-topleft: 4px;
+		-moz-border-radius-topright: 4px;
+		border-radius-topright: 4px;
+		text-align: center;
+		position: relative;
+		top: 0px;
+		left: 6px;
+		float: left;
+	}
+/* --------------------------------------------- */	
+/* Gallery nav */
+.gallery-entry .gallery-nav {
+	width: 580px;
+	height: 24px;
+	background: #ddd;
+	padding: 5px 0;
+	-moz-border-radius-topleft: 4px;
+	border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	border-radius-topright: 4px;
+}
+
+.gallery-entry .gallery-nav span a {
+	font-family: Arial;
+	font-size: 18px;
+	color:#222;
+	text-decoration: none;
+	padding: 3px 1px;
+}
+	.gallery-entry .gallery-nav span a:hover{
+		text-decoration: underline;
+	}
+	.gallery-entry #next a {
+		background: url(next.png) no-repeat right 3px;
+		float: right;
+		width: 30px;
+		height: 20px;
+	}
+	.gallery-entry #previous a {
+		background: url(previous.png) no-repeat left 3px;
+		float: right;
+		width: 30px;
+		height: 20px;
+	}
+	.gallery-entry #previous a span, .gallery-entry #next a span {
+		display: none;
+	}
+/* --------------------------------------------- */	
+/* Gallery carousel module */	
+#gallery-more {
+	background: #000;
+	margin:0;
+	padding: 6px 0;
+	width: 580px;
+	text-align: left;
+	position: relative;
+	overflow: hidden;
+}
+	#gallery-more h4 {
+		display: none;
+	}
+	#gallery-more ul, #gallery-more li {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+	#gallery-more li {
+		float: left;
+		width: 80px;
+		height: 80px;
+		background: #999;
+		margin-right: 4px;
+	}
+#gallery-more-nav {
+	width: 100%;
+	font-size: 12px;
+	text-align: right;
+}
+#gallery-more li#last {
+	margin-right: 0;
+}
+/* --------------------------------------------- */	
+/* More in this gallery */
+#more-in-this-gallery {
+    z-index: 2;
+    padding: 0;
+    margin: 0 auto;
+	clear:both;
+	width: 500px;
+	height: 80px;
+	overflow: hidden;
+	postion: relative;
+}
+	#carousel-previous a {
+		background: url(prev_circle.png) no-repeat left 3px;
+		width: 30px;
+		height: 30px;
+		position: absolute;
+		left: 8px;
+		margin-top: 28px;
+	}
+	#carousel-next a {
+		background: url(next_circle.png) no-repeat left 3px;
+		width: 30px;
+		height: 30px;
+		position: absolute;
+		right: 0;
+		margin-top: 28px;
+	}
+	#carousel-next, #carousel-previous {
+		display: inline;
+	}	
+	#carousel-next a span, #carousel-previous a span {
+		display: none;
+	}
+/* --------------------------------------------- */	
+/* Byrne Experimental */
+/*
+.image-description {
+  position: absolute;
+  bottom: -100px;
+}
+#gallery-item {
+  position: relative;
+  z-index: 100;
+  overflow: hidden;
+}
+#gallery-more {
+  position: absolute;
+  bottom: 200px;
+  z-index: 1000;
+  padding: 0 0 10px 0px;
+}
+#gallery-more h4 {
+  background: white;
+  width: 100px;
+  margin-left: 10px;
+  padding-left: 5px;
+  border-top-right-radius: 5px;
+  -moz-border-radius-topright: 5px;
+  -webkit-border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+}
+.jcarousel-container {
+  background: white;
+}
+ul#more-in-this-gallery {
+  height: 112px;
+  background: white;
+  overflow: hidden;
+  padding: 5px;
+}
+ul#more-in-this-gallery li {
+  margin-bottom: 5px;
+}
+*/
+/* --------------------------------------------- */	
+/* jCarousel */
+.jcarousel-container {
+    position: relative;
+}
+.jcarousel-clip {
+    z-index: 2;
+    padding: 0;
+    margin: 0 auto;
+	clear:both;
+	width: 500px;
+	height: 80px;
+	overflow: hidden;
+	postion: relative;
+}
+.jcarousel-list {
+    z-index: 1;
+    overflow: hidden;
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+}
+.jcarousel-list li,
+.jcarousel-item, #more-in-this-gallery-inner li {
+    float: left;
+    list-style: none;
+    /* We set the width/height explicitly. No width/height causes infinite loops. */
+    width: 80px;
+    height: 80px;
+}
+.jcarousel-next, .jcarousel-next-horizontal {
+	width: 150px;
+	float: right;
+	text-align:right;
+}
+.jcarousel-previous, .jcarousel-prev-horizontal {
+	width: 150px;
+	float: left;
+}
