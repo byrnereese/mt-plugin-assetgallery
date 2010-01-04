@@ -56,7 +56,7 @@ sub load_customfield_type {
                 <div class="textarea-wrapper">&#60;<__trans phrase="Site Root">&#62; / <input type="text" name="options" value="<mt:var name="options" escape="html">" id="options" class="half-width" /></div>
                 <p class="hint"><__trans phrase="Please enter a full path to where files should be uploaded to. Applicable <a href="http://www.movabletype.org/documentation/appendices/archive-file-path-specifiers.html">file path specifiers</a> may be used."></p>
             },
-            column_def => 'vchar',
+            column_def => 'vclob',
             order      => 799,
             no_default => 1
         }

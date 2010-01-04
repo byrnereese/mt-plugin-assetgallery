@@ -1,10 +1,22 @@
 id: AssetGallery
 name: Asset Gallery
-version: 1.2
+version: 1.2.1
 description: "Introduces a new custom field that allows you to create a gallery of assets"
 author_name: "Byrne Reese"
 author_link: "http://www.endevver.com/"
-schema_version: 1
+schema_version: 3.1
+
+upgrade_functions:
+  column_def_type_change:
+    version_limit: 3.1
+    priority: 1
+    updater:
+      type: 'entry'
+      label: 'Converting vchar to vclob...'
+      condition: > 
+           sub { $_[0]->slideshow ne '' }
+      sql: > 
+           update mt_entry_meta set entry_meta_vclob = entry_meta_vchar where entry_meta_vchar is not null and entry_meta_type = 'field.slideshow' 
 
 customfield_types: $AssetGallery::AssetGallery::load_customfield_type
 tags: $AssetGallery::AssetGallery::load_tags
