@@ -1,6 +1,6 @@
 id: AssetGallery
 name: Asset Gallery
-version: 1.2.1
+version: 1.2.2
 description: "Introduces a new custom field that allows you to create a gallery of assets"
 author_name: "Byrne Reese"
 author_link: "http://www.endevver.com/"
@@ -19,7 +19,6 @@ upgrade_functions:
            update mt_entry_meta set entry_meta_vclob = entry_meta_vchar where entry_meta_vchar is not null and entry_meta_type = 'field.slideshow' 
 
 customfield_types: $AssetGallery::AssetGallery::load_customfield_type
-tags: $AssetGallery::AssetGallery::load_tags
 
 default_templates:
     base_path: templates
@@ -27,6 +26,8 @@ default_templates:
       ag_slideshow:
         label: 'Asset Gallery Slideshow'
 
+#tags: $AssetGallery::AssetGallery::load_tags
+init_app: $AssetGallery::AssetGallery::init_app
 callbacks: 
   MT::App::CMS::template_source.edit_entry: $AssetGallery::AssetGallery::xfrm_entry
   api_post_save.entry: 

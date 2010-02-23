@@ -5,6 +5,15 @@ use MT::Util qw( encode_url );
 use File::Spec qw( catfile );
 use Digest::SHA1 qw( sha1_base64 );
 
+sub init_app {
+    my $plugin = shift;
+    my ($app) = @_;
+    return if $app->id eq 'wizard';
+    my $r = $plugin->registry;
+    $r->{tags} = sub { load_tags( $app, $plugin ) };
+
+}
+
 sub load_customfield_type {
     my $customfield_type = {
         'asset_gallery' => {
@@ -66,6 +75,7 @@ sub load_customfield_type {
 }
 
 sub load_tags {
+    my $app = shift;
     my $cmpnt  = MT->component('commercial');
     my $fields = $cmpnt->{customfields};
     my $tags   = {};
