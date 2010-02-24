@@ -42,7 +42,6 @@
 		width: 494px;
 		position:relative;
 		top: -1px;
-		margin-left: 50px; /* Mid-Century Specific */
 		margin-bottom: 8px;
 		-moz-border-radius-bottomright: 4px;
 		-moz-border-radius-bottomleft: 4px;
@@ -132,11 +131,10 @@
 	background: #000;
 	margin:0;
 	padding: 6px 0;
-	width: 466px;
+	width: 465px;
 	text-align: left;
 	position: relative;
 	overflow: hidden;
-	margin-left: 50px; // Mid-Century Specific
 	top: -1px;
 	padding-left: 35px;
 }
@@ -190,6 +188,7 @@
 		position: absolute;
 		right: 0;
 		margin-top: 28px;
+                z-index: 2;
 	}
 	#carousel-next, #carousel-previous {
 		display: inline;

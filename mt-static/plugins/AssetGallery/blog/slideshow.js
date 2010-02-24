@@ -1,3 +1,16 @@
+	// Use initCallback to assign control funcitonality to the carousel
+	function slideshow_initCallback(carousel) {
+		// Use the specified next/prev buttons for the carousel
+		    $('#carousel-next').bind('click', function() {
+		        carousel.next();
+		        return false;
+		    });
+		    $('#carousel-previous').bind('click', function() {
+		        carousel.prev();
+		        return false;
+		    });
+	}
+
 $(document).ready( function() {
     $('.gallery-item').bind('slidechange', function( event, idx ) {
 	$('.ad-placement iframe').each( function() {
@@ -29,25 +42,6 @@ $(document).ready( function() {
 	$(this).animate({ 'bottom': '-=120' }, 'slow');
       });
     */
-	// Use initCallback to assign control funcitonality to the carousel
-	function slideshow_initCallback(carousel) {
-		// Use the specified next/prev buttons for the carousel
-		    $('#carousel-next').bind('click', function() {
-		        carousel.next();
-		        return false;
-		    });
-		    $('#carousel-previous').bind('click', function() {
-		        carousel.prev();
-		        return false;
-		    });
-	}
-    $('ul#more-in-this-gallery-inner').jcarousel({
-      scroll: 6,
-	  initCallback: slideshow_initCallback,
-		//	This tells jCarousel NOT to autobuild prev/next buttons
-		buttonNextHTML: null,
-		buttonPrevHTML: null
-      });
     $('ul#more-in-this-gallery-inner li a').click( function() {
 	var a = $(this).attr('href');
         if ( $(this).parent().hasClass('selected') ) return false;
