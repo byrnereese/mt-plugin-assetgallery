@@ -103,6 +103,29 @@
 	.gallery-entry #previous a span, .gallery-entry #next a span {
 		display: none;
 	}
+    /* Gallery share tools */
+    #gallery-share {
+        float: left;
+        margin-left: 26px;
+        position: relative;
+        top: 2px;
+    }
+    #gallery-share ul, #gallery-share li {
+        display: inline;
+        list-style-type: none;
+        margin: 0 12px 0 0;
+        padding: 0;
+    }
+    #gallery-share .fb_share { font-family: Arial, Verdana, Helvetica; font-size: 12px; color: #000; position: relative; top: 0px; }
+        #gallery-share .fb_share a { color: #222;}
+    #gallery-share .digg_share { font-family: Arial, Verdana, Helvetica; font-size: 12px; color: #000; position: relative; top: 0px; }
+        #gallery-share .digg_share a:link, #gallery-share .digg_share a:visited { color: #222; text-decoration: none; }
+        #gallery-share .digg_share a:hover, #gallery-share .digg_share a:active { color: #222; text-decoration: underline; }
+        #gallery-share .digg_share a { padding-left:22px; background: url(16x16-digg-guy.gif) no-repeat left -1px;}
+    #gallery-share .tweet_share { font-family: Arial, Verdana, Helvetica; font-size: 12px; color: #000; position: relative; top: 0px; }
+        #gallery-share .tweet_share a:link, #gallery-share .tweet_share a:visited { color: #222; text-decoration: none; }
+        #gallery-share .tweet_share a:hover, #gallery-share .tweet_share a:active { color: #222; text-decoration: underline; }
+        #gallery-share .tweet_share a { padding-left:22px; background: url(twitter.16x16.png) no-repeat left -1px;}
 /* --------------------------------------------- */	
 /* Gallery carousel module */	
 #gallery-more {
