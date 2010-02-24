@@ -1,16 +1,30 @@
 /* --------------------------------------------- */
 /* Images and captions + other stuff */
+#gallery-share {
+  float:left;
+}
+#gallery-share li {
+  list-style: none;
+  float: left;
+  margin-right: 10px;
+}
+#slideshow { position: relative; }
+.gallery-nav {
+  position: relative;
+  margin-left: 50px;
+}
 .gallery-item {
 	margin-top: 12px;
 }
 .gallery-entry .gallery-slide {
-	width: 574px;
+	width: 500px;
 	height: 380px;
 	background: #000;
 	text-align: center;
 	padding: 3px;
     position: relative;
 	overflow: hidden;
+	top: -1px;
 }
 	.gallery-entry .gallery-slide img {
 		margin: 0 auto;
@@ -25,7 +39,10 @@
 		text-align: left;
 		background: #ddd;
 		padding: 8px 0px 8px 8px;
-		width: 572px;
+		width: 494px;
+		position:relative;
+		top: -1px;
+		margin-left: 50px; /* Mid-Century Specific */
 		margin-bottom: 8px;
 		-moz-border-radius-bottomright: 4px;
 		-moz-border-radius-bottomleft: 4px;
@@ -50,7 +67,7 @@
 /* --------------------------------------------- */	
 /* Gallery nav */
 .gallery-entry .gallery-nav {
-	width: 580px;
+	width: 500px;
 	height: 24px;
 	background: #ddd;
 	padding: 5px 0;
@@ -58,6 +75,7 @@
 	border-radius-topleft: 4px;
 	-moz-border-radius-topright: 4px;
 	border-radius-topright: 4px;
+	position: relative;
 }
 
 .gallery-entry .gallery-nav span a {
@@ -91,10 +109,13 @@
 	background: #000;
 	margin:0;
 	padding: 6px 0;
-	width: 580px;
+	width: 466px;
 	text-align: left;
 	position: relative;
 	overflow: hidden;
+	margin-left: 50px; // Mid-Century Specific
+	top: -1px;
+	padding-left: 35px;
 }
 	#gallery-more h4 {
 		display: none;
@@ -153,49 +174,6 @@
 	#carousel-next a span, #carousel-previous a span {
 		display: none;
 	}
-/* --------------------------------------------- */	
-/* Byrne Experimental */
-/*
-.image-description {
-  position: absolute;
-  bottom: -100px;
-}
-#gallery-item {
-  position: relative;
-  z-index: 100;
-  overflow: hidden;
-}
-#gallery-more {
-  position: absolute;
-  bottom: 200px;
-  z-index: 1000;
-  padding: 0 0 10px 0px;
-}
-#gallery-more h4 {
-  background: white;
-  width: 100px;
-  margin-left: 10px;
-  padding-left: 5px;
-  border-top-right-radius: 5px;
-  -moz-border-radius-topright: 5px;
-  -webkit-border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
-  -moz-border-radius-topleft: 5px;
-  -webkit-border-top-left-radius: 5px;
-}
-.jcarousel-container {
-  background: white;
-}
-ul#more-in-this-gallery {
-  height: 112px;
-  background: white;
-  overflow: hidden;
-  padding: 5px;
-}
-ul#more-in-this-gallery li {
-  margin-bottom: 5px;
-}
-*/
 /* --------------------------------------------- */	
 /* jCarousel */
 .jcarousel-container {
