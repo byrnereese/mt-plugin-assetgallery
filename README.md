@@ -103,6 +103,18 @@ Add this section somewhere inbetween `<head>` and `</head>`:
     <script src="<$mt:StaticWebPath$>jquery/jquery.js" type="text/javascript"></script>
     <script src="<$mt:StaticWebPath$>plugins/AssetGallery/blog/jquery.jcarousel.pack.js" type="text/javascript"></script>
     <script src="<$mt:StaticWebPath$>plugins/AssetGallery/blog/slideshow.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    $('ul#more-in-this-gallery-inner').jcarousel({
+    $(document).ready( function() {
+         scroll: 6, // customize this based upon the number of thumbnails that
+                    //    will be visible in the carousel by default
+         initCallback: slideshow_initCallback,
+         // This tells jCarousel NOT to autobuild prev/next buttons
+         buttonNextHTML: null,
+         buttonPrevHTML: null
+      });
+    });
+    </script>
     </mt:if>
 
 *Tip: this is wrapped in an `<mt:if>` block so that we only load all the
