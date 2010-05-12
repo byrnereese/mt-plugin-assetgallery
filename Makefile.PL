@@ -1,7 +1,12 @@
 use ExtUtils::MakeMaker;
 
+use YAML::Any qw(LoadFile);
+my $file = "plugins/Supr/config.yaml";
+my $version = LoadFile($file)->{version} ||
+    die "No version found in $file";
+
 WriteMakefile(
     NAME            => 'Asset Gallery',
-    VERSION         => '1.2.2',
+    VERSION         => $version,
     DISTNAME        => 'AssetGallery',
 );

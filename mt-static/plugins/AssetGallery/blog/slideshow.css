@@ -11,7 +11,6 @@
 #slideshow { position: relative; }
 .gallery-nav {
   position: relative;
-  margin-left: 50px;
 }
 .gallery-item {
 	margin-top: 12px;
@@ -42,7 +41,6 @@
 		width: 494px;
 		position:relative;
 		top: -1px;
-		margin-left: 50px; /* Mid-Century Specific */
 		margin-bottom: 8px;
 		-moz-border-radius-bottomright: 4px;
 		-moz-border-radius-bottomleft: 4px;
@@ -136,7 +134,6 @@
 	text-align: left;
 	position: relative;
 	overflow: hidden;
-	margin-left: 50px; // Mid-Century Specific
 	top: -1px;
 	padding-left: 35px;
 }

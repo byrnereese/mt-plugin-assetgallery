@@ -2,7 +2,7 @@ package AssetGallery;
 
 use strict;
 use MT::Util qw( encode_url );
-use File::Spec qw( catfile );
+use File::Spec::Functions;
 use Digest::SHA1 qw( sha1_base64 );
 
 sub init_app {
